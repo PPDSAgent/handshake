@@ -1,0 +1,340 @@
+#!/usr/bin/env python3
+"""Handshake verifier: link checks, unit lint, deck lint.
+
+Usage:
+    python3 tools/verify.py            # run everything
+    python3 tools/verify.py --links    # URL allowlist + reachability only
+    python3 tools/verify.py --units    # curriculum format lint only
+    python3 tools/verify.py --deck     # deck.tsv schema lint, all learners
+    python3 tools/verify.py --learners # template + learner profile/state lint
+    python3 tools/verify.py --hooks    # Rule-1 heuristic on hook/hint prose
+    python3 tools/verify.py --hygiene  # public-repo personal-data heuristic, all tracked files
+
+Exit 0 = clean. Exit 1 = findings (printed). Stdlib only — no installs needed.
+"""
+
+import re
+import sys
+import urllib.request
+from datetime import date
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+SOURCES = ROOT / "curriculum" / "sources.md"
+LEARNERS = ROOT / "learners"
+PROFILE_KEYS = ["learner", "display_name", "tutor_name", "goal", "surface", "track",
+                "partner", "background"]
+STATE_KEYS = ["current_unit", "streak", "last_session", "asl_ms_speed"]
+SURFACES = {"claude-code", "lite"}
+TRACKS = {"workshop", "clinical"}
+NON_LEARNER_DIRS = {"shared", "_template"}
+# Heuristic flag for sign-production language in hooks/hints (Rule 1). Non-fatal:
+# a match means NEEDS-HUMAN-EYES, not automatically wrong.
+PRODUCTION_RE = re.compile(
+    r"(?i)\b(handshapes?|palms?|fingers?|thumbs?|wrists?|knuckles?|fists?|chin|"
+    r"forehead|cheeks?|chest|shoulders?|moves?|moving|motion|movement|circles?|"
+    r"taps?|twists?|salutes?|flat hand|index)\b")
+
+warnings = []
+
+
+def warn(msg):
+    warnings.append(msg)
+    print(f"  NEEDS-HUMAN-EYES  {msg}")
+
+
+def decks():
+    """Every real learner's deck: [(slug, Path), ...]. Excludes the template."""
+    return sorted((d.name, d / "deck.tsv") for d in LEARNERS.iterdir()
+                  if d.is_dir() and d.name not in NON_LEARNER_DIRS
+                  and (d / "deck.tsv").exists())
+UA = {"User-Agent": "Mozilla/5.0 (Handshake verify.py; personal ASL tutor link check)"}
+URL_RE = re.compile(r"https?://[^\s)\]|<>`\"']+")
+DECK_COLS = ["id", "type", "prompt", "answer_hint", "source_url", "unit", "ease",
+             "interval_days", "due", "reps", "lapses", "added"]
+CARD_TYPES = {"fingerspell", "vocab", "phrase", "lookup"}
+UNIT_SECTIONS = ["## Why this unit", "## Watch", "## Learn", "## Drill",
+                 "## Family mission", "## Checkpoint"]
+
+errors = []
+
+
+def err(msg):
+    errors.append(msg)
+    print(f"  FAIL  {msg}")
+
+
+def host_of(url):
+    h = url.split("/")[2].lower()
+    return h[4:] if h.startswith("www.") else h
+
+
+def allowed_hosts():
+    """Hosts from sources.md, excluding tables under a 'Candidates' heading."""
+    hosts = set()
+    section_ok = True
+    for line in SOURCES.read_text().splitlines():
+        if line.startswith("## "):
+            section_ok = "candidate" not in line.lower()
+        if section_ok:
+            for u in URL_RE.findall(line):
+                hosts.add(host_of(u))
+    return hosts
+
+
+def reachable(url):
+    for _ in range(2):  # one retry — external sites hiccup
+        try:
+            req = urllib.request.Request(url, headers=UA)
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                if resp.status < 400:
+                    return True
+        except Exception:
+            continue
+    return False
+
+
+def check_links():
+    print("== links")
+    hosts = allowed_hosts()
+    urls = set()
+    for md in (ROOT / "curriculum").glob("*.md"):
+        if md.name == "sources.md":
+            continue  # sources.md is the allowlist itself, checked below
+        for u in URL_RE.findall(md.read_text()):
+            urls.add((u.rstrip(".,"), md.name))
+    for slug, deck in decks():
+        for row in deck.read_text().splitlines()[1:]:
+            cells = row.split("\t")
+            if len(cells) == len(DECK_COLS) and cells[4].startswith("http"):
+                urls.add((cells[4], f"{slug}/deck.tsv"))
+    # allowlist itself must be reachable too (skip the Candidates section)
+    section_ok = True
+    for line in SOURCES.read_text().splitlines():
+        if line.startswith("## "):
+            section_ok = "candidate" not in line.lower()
+        if section_ok:
+            for u in URL_RE.findall(line):
+                urls.add((u.rstrip(".,"), "sources.md"))
+    for url, origin in sorted(urls):
+        if host_of(url) not in hosts:
+            err(f"{origin}: host not on allowlist -> {url}")
+        elif not reachable(url):
+            err(f"{origin}: unreachable -> {url}")
+    # Installer + README links: reachability only (no allowlist — they point at
+    # toolchain sites, not sign sources). Self-references to this repo are
+    # skipped: they 404 to anonymous checks while the repo is private.
+    reach_only = set()
+    for md in [ROOT / "README.md", *(ROOT / "install").glob("*.md")]:
+        for u in URL_RE.findall(md.read_text()):
+            u = u.rstrip(".,")
+            if "github.com/PPDSAgent/handshake" in u:
+                continue
+            reach_only.add((u, md.name))
+    for url, origin in sorted(reach_only):
+        if not reachable(url):
+            err(f"{origin}: unreachable -> {url}")
+    print(f"  checked {len(urls)} curriculum urls + {len(reach_only)} installer urls")
+
+
+def check_units():
+    print("== units")
+    for md in sorted((ROOT / "curriculum").glob("unit-*.md")):
+        text = md.read_text()
+        m = re.match(r"---\n(.*?)\n---\n", text, re.S)
+        if not m:
+            err(f"{md.name}: missing frontmatter")
+            continue
+        fm = m.group(1)
+        for field in ("unit:", "title:", "status:", "est_sessions:"):
+            if field not in fm:
+                err(f"{md.name}: frontmatter missing '{field}'")
+        status = re.search(r"status:\s*(\S+)", fm)
+        if status and status.group(1) not in ("draft", "built", "reviewed"):
+            err(f"{md.name}: bad status '{status.group(1)}'")
+        pos = 0
+        for section in UNIT_SECTIONS:
+            found = text.find(section, pos)
+            if found == -1:
+                err(f"{md.name}: section missing or out of order: '{section}'")
+            else:
+                pos = found
+        for line in text.splitlines():
+            if line.startswith("|") and "http" in line and line.count("|") not in (0, 4):
+                err(f"{md.name}: Learn table row needs exactly 3 columns: {line[:60]}")
+
+
+def check_deck():
+    print("== decks")
+    total = 0
+    for slug, deck in decks():
+        where = f"{slug}/deck.tsv"
+        lines = deck.read_text().splitlines()
+        if not lines or lines[0].split("\t") != DECK_COLS:
+            err(f"{where}: header row does not match spec (see learners/README.md)")
+            continue
+        seen = set()
+        for n, row in enumerate(lines[1:], start=2):
+            cells = row.split("\t")
+            if len(cells) != len(DECK_COLS):
+                err(f"{where} line {n}: {len(cells)} columns, expected {len(DECK_COLS)}")
+                continue
+            cid, ctype, ease, due, added = cells[0], cells[1], cells[6], cells[8], cells[11]
+            if cid in seen:
+                err(f"{where} line {n}: duplicate id '{cid}'")
+            seen.add(cid)
+            if ctype not in CARD_TYPES:
+                err(f"{where} line {n}: bad type '{ctype}'")
+            try:
+                e = float(ease)
+                if not 1.3 <= e <= 2.8:
+                    err(f"{where} line {n}: ease {e} outside [1.3, 2.8]")
+            except ValueError:
+                err(f"{where} line {n}: ease not a number")
+            for label, val in (("due", due), ("added", added)):
+                try:
+                    date.fromisoformat(val)
+                except ValueError:
+                    err(f"{where} line {n}: {label} not ISO date: '{val}'")
+        total += len(lines) - 1
+    print(f"  checked {total} cards across {len(decks())} learners")
+
+
+def check_learners():
+    print("== learners")
+    errors_before = len(errors)
+    # The template must exist and carry every key — it is what installs copy.
+    tmpl = LEARNERS / "_template"
+    for fname, keys in (("profile.md", PROFILE_KEYS), ("state.md", STATE_KEYS)):
+        f = tmpl / fname
+        if not f.exists():
+            err(f"_template/{fname}: missing — installs copy this directory")
+            continue
+        text = f.read_text()
+        for key in keys:
+            if not re.search(rf"(?m)^-\s+{re.escape(key)}:", text):
+                err(f"_template/{fname}: missing key '{key}'")
+    for fname in ("journal.md", "deck.tsv"):
+        if not (tmpl / fname).exists():
+            err(f"_template/{fname}: missing — installs copy this directory")
+    template_clean = len(errors) == errors_before
+    # Real learners are created locally at install time; zero is normal for a
+    # fresh clone (and required for the public repo — no personal data ships).
+    slugs = [s for s, _ in decks()]
+    for slug in slugs:
+        d = LEARNERS / slug
+        for fname, keys in (("profile.md", PROFILE_KEYS), ("state.md", STATE_KEYS)):
+            f = d / fname
+            if not f.exists():
+                err(f"{slug}/{fname}: missing")
+                continue
+            text = f.read_text()
+            for key in keys:
+                if not re.search(rf"(?m)^-\s+{re.escape(key)}:", text):
+                    err(f"{slug}/{fname}: missing key '{key}'")
+        prof = (d / "profile.md")
+        if prof.exists():
+            text = prof.read_text()
+            got = re.search(r"(?m)^-\s+learner:\s*(\S+)", text)
+            if got and got.group(1) != slug:
+                err(f"{slug}/profile.md: learner '{got.group(1)}' != directory '{slug}'")
+            for key, valid in (("surface", SURFACES), ("track", TRACKS)):
+                m = re.search(rf"(?m)^-\s+{key}:\s*(\S+)", text)
+                if m and m.group(1) not in valid:
+                    err(f"{slug}/profile.md: {key} '{m.group(1)}' not in {sorted(valid)}")
+            partner = re.search(r"(?m)^-\s+partner:\s*(\S+)", text)
+            if partner and partner.group(1) not in slugs + ["none"]:
+                err(f"{slug}/profile.md: partner '{partner.group(1)}' is not a learner")
+        if not (d / "journal.md").exists():
+            err(f"{slug}/journal.md: missing")
+    who = ", ".join(slugs) if slugs else "none (fresh copy — created at install)"
+    tmpl_word = "template ok" if template_clean else "template FAILING"
+    print(f"  {tmpl_word}; {len(slugs)} local learner(s): {who}")
+
+
+def check_public_hygiene():
+    """This is a public repo: no personal data of any real learner, anywhere.
+    The governing files promise it; this scan looks for it. Every tracked file,
+    no extension filter. Non-fatal — flags mean a human reads them."""
+    print("== public hygiene")
+    import subprocess
+    age_re = re.compile(r"(?i)\b[6-9][0-9][- ]?(?:year|yr)|\bin (?:their|his|her) "
+                        r"(?:sixties|seventies|eighties|nineties)\b")
+    rel_re = re.compile(r"(?i)\b(?:dad|mom|father|mother)\b|\bmy (?:wife|husband|parents)\b")
+    health_re = re.compile(r"(?i)losing (?:their|his|her) hearing|\bdiagnos|\bhearing loss\b")
+    try:
+        tracked = subprocess.run(["git", "ls-files"], capture_output=True, text=True,
+                                 cwd=ROOT, timeout=10).stdout.splitlines()
+    except Exception as e:
+        err(f"public-hygiene: could not list tracked files ({e})")
+        return
+    n = 0
+    for rel in tracked:
+        if rel == "tools/verify.py":
+            continue  # the scanner's own pattern definitions are not personal data
+        p = ROOT / rel
+        try:
+            text = p.read_text()
+        except Exception:
+            continue  # binary or unreadable — nothing to scan
+        n += 1
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            for label, rx in (("age", age_re), ("relationship", rel_re),
+                              ("health", health_re)):
+                m = rx.search(line)
+                # ALL-CAPS matches are ASL glosses (MOTHER, FATHER…), not people.
+                if m and not m.group(0).isupper():
+                    warn(f"{rel}:{lineno}: {label} phrase ('{m.group(0)}'): "
+                         f"{line.strip()[:60]}")
+    print(f"  scanned {n} tracked files")
+
+
+def check_hooks():
+    """Heuristic Rule-1 lint: flag production-description language in Learn-table
+    hooks and deck answer_hints. Non-fatal — flags mean a human reads them."""
+    print("== hooks (Rule 1 heuristic)")
+    n = 0
+    for md in sorted((ROOT / "curriculum").glob("unit-*.md")):
+        for line in md.read_text().splitlines():
+            if line.startswith("|") and "http" in line:
+                cells = line.split("|")
+                if len(cells) >= 4:
+                    hook = cells[3]
+                    m = PRODUCTION_RE.search(hook)
+                    if m:
+                        warn(f"{md.name}: hook may describe production "
+                             f"('{m.group(0)}'): {hook.strip()[:60]}")
+                    n += 1
+    for slug, deck in decks():
+        for row in deck.read_text().splitlines()[1:]:
+            cells = row.split("\t")
+            if len(cells) == len(DECK_COLS):
+                m = PRODUCTION_RE.search(cells[3])
+                if m:
+                    warn(f"{slug}/deck.tsv: answer_hint may describe production "
+                         f"('{m.group(0)}'): {cells[3][:60]}")
+                n += 1
+    print(f"  scanned {n} hooks/hints")
+
+
+if __name__ == "__main__":
+    args = sys.argv[1:]
+    run_all = not args
+    if run_all or "--units" in args:
+        check_units()
+    if run_all or "--learners" in args:
+        check_learners()
+    if run_all or "--deck" in args:
+        check_deck()
+    if run_all or "--hooks" in args:
+        check_hooks()
+    if run_all or "--hygiene" in args:
+        check_public_hygiene()
+    if run_all or "--links" in args:
+        check_links()
+    summary = f"{len(warnings)} NEEDS-HUMAN-EYES flag(s) for review" if warnings \
+        else "0 flags"
+    if errors:
+        print(f"\n{len(errors)} finding(s), {summary}. Fix before shipping — Rule 3.")
+        sys.exit(1)
+    print(f"\nAll clean ({summary}).")

@@ -1,0 +1,14 @@
+.DS_Store
+dist/
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+# A learner's machine may add local-only notes; honor the pattern
+*.local.md
+# Machine-local: which learner this machine belongs to
+learners/current.txt
+# Handshake Lite build output + local calibration
+lite/data.json
+lab/calibration.json
+lab/.venv/
