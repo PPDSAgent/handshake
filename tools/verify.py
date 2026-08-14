@@ -5,6 +5,7 @@ Usage:
     python3 tools/verify.py            # run everything
     python3 tools/verify.py --links    # URL allowlist + reachability only
     python3 tools/verify.py --units    # curriculum format lint only
+    python3 tools/verify.py --index    # units-index.md vs frontmatter consistency
     python3 tools/verify.py --deck     # deck.tsv schema lint, all learners
     python3 tools/verify.py --learners # template + learner profile/state lint
     python3 tools/verify.py --hooks    # Rule-1 heuristic on hook/hint prose
@@ -33,7 +34,7 @@ NON_LEARNER_DIRS = {"shared", "_template"}
 PRODUCTION_RE = re.compile(
     r"(?i)\b(handshapes?|palms?|fingers?|thumbs?|wrists?|knuckles?|fists?|chin|"
     r"forehead|cheeks?|chest|shoulders?|moves?|moving|motion|movement|circles?|"
-    r"taps?|twists?|salutes?|flat hand|index)\b")
+    r"taps?|twists?|salutes?|flat hand|index finger)\b")
 
 warnings = []
 
@@ -252,6 +253,58 @@ def check_learners():
     print(f"  {tmpl_word}; {len(slugs)} local learner(s): {who}")
 
 
+def check_index():
+    """units-index.md is authoritative; frontmatter must agree with it.
+
+    Added after the Phase 1 batch shipped 11 units whose frontmatter said `built`
+    while the index still said `planned` — a contradiction nothing checked.
+    """
+    print("== index")
+    idx = ROOT / "curriculum" / "units-index.md"
+    rows = {}
+    for line in idx.read_text().splitlines():
+        m = re.match(r"^\|\s*(\d+)\s*\|\s*`([^`]+)`\s*\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*(\d+)\s*\|", line)
+        if m:
+            rows[int(m.group(1))] = {"file": m.group(2), "title": m.group(3),
+                                     "status": m.group(4), "est": int(m.group(5))}
+    files = sorted((ROOT / "curriculum").glob("unit-*.md"))
+    seen = set()
+    for f in files:
+        text = f.read_text()
+        fm = re.match(r"---\n(.*?)\n---\n", text, re.S)
+        if not fm:
+            continue  # check_units already reports missing frontmatter
+        def field(k):
+            m = re.search(rf"(?m)^{k}:\s*(.+?)\s*$", fm.group(1))
+            return m.group(1) if m else None
+        num = field("unit")
+        try:
+            num = int(num)
+        except (TypeError, ValueError):
+            err(f"{f.name}: frontmatter 'unit:' is not an integer")
+            continue
+        seen.add(num)
+        # the filename encodes the unit number too — they must agree
+        fnum = re.match(r"unit-(\d+)-", f.name)
+        if fnum and int(fnum.group(1)) != num:
+            err(f"{f.name}: frontmatter unit {num} != filename unit {int(fnum.group(1))}")
+        row = rows.get(num)
+        if not row:
+            err(f"{f.name}: unit {num} is not listed in units-index.md")
+            continue
+        if row["file"] != f.name:
+            err(f"units-index.md row {num:02d}: filename '{row['file']}' != actual '{f.name}'")
+        for label, got, want in (("title", field("title"), row["title"]),
+                                 ("status", field("status"), row["status"]),
+                                 ("est_sessions", field("est_sessions"), str(row["est"]))):
+            if got != want:
+                err(f"{f.name}: {label} '{got}' != units-index.md '{want}'")
+    for num, row in rows.items():
+        if num not in seen:
+            err(f"units-index.md lists unit {num:02d} ({row['file']}) but no such file exists")
+    print(f"  checked {len(files)} unit files against {len(rows)} index rows")
+
+
 def check_public_hygiene():
     """This is a public repo: no personal data of any real learner, anywhere.
     The governing files promise it; this scan looks for it. Every tracked file,
@@ -314,7 +367,32 @@ def check_hooks():
                     warn(f"{slug}/deck.tsv: answer_hint may describe production "
                          f"('{m.group(0)}'): {cells[3][:60]}")
                 n += 1
-    print(f"  scanned {n} hooks/hints")
+    # Rule 1 applies to ALL unit prose, not just hooks — the Why/Watch/Drill/
+    # Mission/Checkpoint sections can describe production just as easily.
+    prose = 0
+    for md in sorted((ROOT / "curriculum").glob("unit-*.md")):
+        for lineno, line in enumerate(md.read_text().splitlines(), start=1):
+            s = line.strip()
+            if not s or s.startswith("|") or s.startswith("#") or s.startswith("---"):
+                continue  # tables handled above; headings and frontmatter carry no hooks
+            prose += 1
+            m = PRODUCTION_RE.search(s)
+            if m:
+                warn(f"{md.name}:{lineno}: prose may describe production "
+                     f"('{m.group(0)}'): {s[:70]}")
+    # Sign count is a guideline (8-15), not law — units 00/01/10/11 are legitimately
+    # outside it. Surface, never fail.
+    for md in sorted((ROOT / "curriculum").glob("unit-*.md")):
+        body = md.read_text()
+        learn = re.search(r"## Learn\n(.*?)(?=\n## )", body, re.S)
+        if learn:
+            count = len([l for l in learn.group(1).splitlines()
+                         if l.startswith("|") and "http" in l])
+            if count and not 8 <= count <= 15:
+                warn(f"{md.name}: {count} signs in ## Learn (guideline is 8-15) — "
+                     f"intentional for a track-split or deliberately-small unit, "
+                     f"otherwise rebalance")
+    print(f"  scanned {n} hooks/hints and {prose} prose lines")
 
 
 if __name__ == "__main__":
@@ -322,6 +400,8 @@ if __name__ == "__main__":
     run_all = not args
     if run_all or "--units" in args:
         check_units()
+    if run_all or "--index" in args:
+        check_index()
     if run_all or "--learners" in args:
         check_learners()
     if run_all or "--deck" in args:
