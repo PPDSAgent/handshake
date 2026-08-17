@@ -19,11 +19,11 @@ nearest generic word.
 
 ## Watch
 
-- https://www.lifeprint.com/asl101/lessons/lesson40.htm — Lesson 40: Tools &
-  Hardware. Covers DRILL, HAMMER, METAL, PLIERS, SCREWDRIVER, and WOOD in a
+- https://www.lifeprint.com/asl101/lessons/lesson40.htm — Lesson 40 — tools and
+  hardware vocabulary. Covers DRILL, HAMMER, METAL, PLIERS, SCREWDRIVER, and WOOD in a
   workshop context — the workshop track draws directly from this one (~10 min).
-- https://www.lifeprint.com/asl101/lessons/lesson53.htm — Lesson 53: Health &
-  Injury. Covers DENTIST, PAIN, PATIENT, TOOTH-ACHE, and CLEAN-UP in a clinic
+- https://www.lifeprint.com/asl101/lessons/lesson53.htm — Lesson 53 — health and
+  injury vocabulary. Covers DENTIST, PAIN, PATIENT, TOOTH-ACHE, and CLEAN-UP in a clinic
   context — the clinical track draws directly from this one (~10 min).
 - https://www.youtube.com/billvicars — Dr. Vicars' channel; search "work" or
   "problem" to see this unit's shared-base signs at conversational speed
@@ -87,9 +87,11 @@ appends to the deck:
   clinical learners get "Sign: TEETH" through "Sign: PATIENT-(medical)". The
   other track's six signs do not enter the deck automatically — either learner
   can still add one as a `lookup` card if they want it.
-- One `phrase` card: "Sign: WORK PROBLEM" (sources: the WORK and PROBLEM pages
-  above) — the two-word combination you'll actually reach for when describing
-  a bad day, whichever track you're on.
+- One `phrase` card: "Sign: WORK PROBLEM" (sign sources: the WORK and PROBLEM pages
+  above) — a two-sign fluency drill, not an attested sentence: those pages teach each
+  sign, neither attests the pairing. It's the combination you'll reach for describing
+  a bad day, whichever track you're on, but let the lesson videos teach you how a
+  signer actually frames it.
 
 ## Family mission
 

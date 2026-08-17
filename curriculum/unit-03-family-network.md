@@ -54,11 +54,14 @@ When this unit opens, `/lesson` appends to the deck:
   "Sign: FATHER", "Sign: WIFE", "Sign: HUSBAND", "Sign: SON", "Sign: DAUGHTER",
   "Sign: BROTHER", "Sign: SISTER", "Sign: GRANDMOTHER", "Sign: GRANDFATHER",
   "Sign: LOVE"). 12 cards.
-- Two `phrase` cards that sequence signs already in the deck — no new production,
-  just order: "Sign: ME LOVE FAMILY" (source: the FAMILY and LOVE pages above, plus
-  ME from unit 00) and "Sign: MOTHER FATHER SISTER BROTHER" (source: the MOTHER,
-  FATHER, SISTER, and BROTHER pages above) — a fixed four-name chain everyone drills
-  the same way, whether or not each relationship applies to them.
+- Two `phrase` cards. **These are fluency drills, not attested sentences.** Each is a
+  run of signs you already know, produced back-to-back so the transitions stop being
+  the slow part — the sources below teach each *sign*, and none of them attests this
+  *order*. Real ASL sentence order is taught by the lesson videos in Watch and is not
+  claimed here: "Sign: ME LOVE FAMILY" (sign sources: the FAMILY and LOVE pages above,
+  plus ME from unit 00) and "Sign: MOTHER FATHER SISTER BROTHER" (sign sources: the
+  MOTHER, FATHER, SISTER, and BROTHER pages above) — a fixed four-name chain everyone
+  drills the same way, whether or not each relationship applies to them.
 
 ## Family mission
 

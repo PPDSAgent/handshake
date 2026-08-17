@@ -51,11 +51,14 @@ When this unit opens, `/lesson` appends to the deck:
 - One `vocab` card per Learn row above (prompts: "Sign: WANT", "Sign: NEED",
   "Sign: EAT", "Sign: DRINK", "Sign: SLEEP", "Sign: GO", "Sign: COME", "Sign: HOME",
   "Sign: BATHROOM"). 9 cards.
-- Three `phrase` cards that sequence signs already in the deck — no new production,
-  just order: "Sign: ME WANT EAT" (source: the WANT and EAT pages above, plus ME
-  from unit 00), "Sign: ME NEED SLEEP" (source: the NEED and SLEEP pages above, plus
-  ME from unit 00), and "Sign: ME GO HOME" (source: the GO and HOME pages above,
-  plus ME from unit 00).
+- Three `phrase` cards. **These are fluency drills, not attested sentences.** Each is
+  a run of signs you already know, produced back-to-back so the transitions stop being
+  the slow part — the sources below teach each *sign*, and none of them attests this
+  *order*. Real ASL sentence order is taught by the lesson videos in Watch and is not
+  claimed here: "Sign: ME WANT EAT" (sign sources: the WANT and EAT pages above, plus
+  ME from unit 00), "Sign: ME NEED SLEEP" (sign sources: the NEED and SLEEP pages
+  above, plus ME from unit 00), and "Sign: ME GO HOME" (sign sources: the GO and HOME
+  pages above, plus ME from unit 00).
 
 ## Family mission
 

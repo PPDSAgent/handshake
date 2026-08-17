@@ -29,7 +29,9 @@ webcam lab (Phase 3) will exploit. Master this and everything else compiles.
 ## Learn
 
 The 26 letters, worked in confusion-cluster groups — not alphabetical order. All
-groups source from the same reference: the fingerspelling page above.
+groups source from the same reference: the fingerspelling page above. Six rows here
+is deliberately below the usual 8–15: each row is a *cluster*, so the real load is
+all 26 letters, grouped by which ones you'll mix up rather than by the alphabet.
 
 | sign | source | hook |
 |---|---|---|

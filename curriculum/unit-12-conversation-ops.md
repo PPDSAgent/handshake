@@ -38,8 +38,8 @@ now" is a number you can point to, not a feeling.
 | HOW-ARE-YOU | https://www.signingsavvy.com/search/how-are-you | the reflex you reach for before any real conversation starts |
 | WHAT-IS-YOUR-NAME | https://www.signingsavvy.com/search/what-is-your-name | the question you'll field constantly once people know you sign |
 | NAME | https://www.lifeprint.com/asl101/pages-signs/n/name.htm | the answer half of introductions — you already used it in unit 00, now folded into a back-and-forth |
-| ME | https://www.lifeprint.com/asl101/pages-signs/m/me.htm | pairs with NAME for the phrase you'll build here, same pairing as unit 00 |
-| NICE-TO-MEET-YOU | https://www.signingsavvy.com/search/nice-to-meet-you | closes the loop that MY-NAME opens |
+| ME | https://www.lifeprint.com/asl101/pages-signs/m/me.htm | useful constantly — but not in an introduction; see the NAME page and unit 00 |
+| NICE-TO-MEET-YOU | https://www.signingsavvy.com/search/nice-to-meet-you | closes the loop an introduction opens |
 | UNDERSTAND | https://www.lifeprint.com/asl101/pages-signs/u/understand.htm | half of conversation repair is just naming what happened |
 | DONT | https://www.lifeprint.com/asl101/pages-signs/d/dont.htm | pairs with UNDERSTAND for the sentence you'll need constantly at first |
 | PLEASE | https://www.lifeprint.com/asl101/pages-signs/p/please.htm | softens every request that follows it |
@@ -55,11 +55,36 @@ When this unit opens, `/lesson` appends to the deck. Most of these are `phrase`
 cards — the point of this unit is assembling signs you already have, not learning new
 ones:
 
-- `phrase` cards, one each: "Sign: HOW-ARE-YOU", "Sign: WHAT-IS-YOUR-NAME", "Sign:
-  MY-NAME ___" (fill in your own name), "Sign: NICE-TO-MEET-YOU", "Sign:
-  I-DONT-UNDERSTAND", "Sign: PLEASE-SIGN-SLOWLY", "Sign: PLEASE-REPEAT-THAT", "Sign:
-  I-HAVE-A-QUESTION", "Sign: CAN-YOU-HELP-ME" — nine cards, each source-linked to the
-  Learn row(s) it's built from.
+**A word about sign order, because it is the whole difficulty of this unit.** ASL word
+order is not English word order, it is not a single fixed rule, and it is emphatically
+not something this file may invent. So every `phrase` card below cites a page where a
+Deaf educator glosses that exact sequence. Constructions we could not find attested are
+*not* shipped as phrases — they are drilled as their component signs, and you assemble
+them from what the lesson videos show you. That is the honest version and also the one
+that won't teach you a sentence no one signs.
+
+- `phrase` cards, five, each with its attested source:
+  - "Sign: HOW YOU?" (How are you?) — glossed at
+    https://www.lifeprint.com/asl101/lessons/lesson02.htm; lesson 5 explicitly warns
+    against the English-shaped `YOU HOW`
+    (https://www.lifeprint.com/asl101/lessons/lesson05.htm).
+  - "Sign: NAME YOU?" (What is your name?) — glossed at
+    https://www.lifeprint.com/asl101/pages-signs/n/name.htm, which also notes the
+    answer is normally just your name, fingerspelled.
+  - "Sign: AGAIN, YOU what-NAME?" (What is your name again?) — practice sheet 1.B,
+    https://www.lifeprint.com/asl101/lessons/lesson01.htm.
+  - "Sign: NEED HELP YOU?" — practice sheet 4.B,
+    https://www.lifeprint.com/asl101/lessons/lesson04.htm.
+  - "Sign: YOUR NAME, SPELL?" (How do you spell your name?) —
+    https://www.lifeprint.com/asl101/lessons/lesson04.htm.
+- `vocab` cards for the repair kit — the signs you need when a conversation stalls,
+  drilled individually because no allowlist source attests a fixed phrase for them:
+  "Sign: don't-UNDERSTAND" (a lesson 1 vocabulary item in its own right,
+  https://www.lifeprint.com/asl101/lessons/lesson01.htm), "Sign: PLEASE", "Sign: SLOW",
+  "Sign: REPEAT", "Sign: QUESTION", "Sign: HELP". In practice you combine them —
+  PLEASE with SLOW, or QUESTION on its own — and the lesson videos in Watch show you
+  how signers actually string them. Ask a fluent signer or your `/coach` session before
+  assuming an order.
 - `vocab` cards, two only: "Sign: QUESTION" and "Sign: HELP" — the two signs from this
   unit that pull double duty outside the fixed phrases above, worth recognizing on
   their own. The other component signs (UNDERSTAND, DONT, PLEASE, SLOW, SIGN, REPEAT)
@@ -72,8 +97,8 @@ This is the last unit, so the mission isn't a task to check off — it's the one
 keep after the checkbox stops mattering. Pick one moment that already happens every
 day between you and the other person: whoever gets home first, saying goodnight,
 answering the door. Agree that from now on, that specific moment happens in ASL —
-HOW-ARE-YOU, MY-NAME (for anyone new), PLEASE-SIGN-SLOWLY or PLEASE-REPEAT-THAT when
-one of you loses the thread. Ten seconds a day, indefinitely. Log which moment you
+`HOW YOU?`, `NAME YOU?` for anyone new, and PLEASE, SLOW or REPEAT when one of you
+loses the thread. Ten seconds a day, indefinitely. Log which moment you
 picked in the journal — that's the artifact this unit is actually asking for, not a
 transcript of one conversation.
 

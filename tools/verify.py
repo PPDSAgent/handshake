@@ -8,6 +8,7 @@ Usage:
     python3 tools/verify.py --index    # units-index.md vs frontmatter consistency
     python3 tools/verify.py --deck     # deck.tsv schema lint, all learners
     python3 tools/verify.py --learners # template + learner profile/state lint
+    python3 tools/verify.py --missions # partner missions vs what each unit teaches
     python3 tools/verify.py --hooks    # Rule-1 heuristic on hook/hint prose
     python3 tools/verify.py --hygiene  # public-repo personal-data heuristic, all tracked files
 
@@ -65,6 +66,12 @@ def err(msg):
     print(f"  FAIL  {msg}")
 
 
+def trim(u):
+    """Strip trailing sentence punctuation. A URL written mid-prose is routinely
+    followed by ; : . , or a closing paren — none of which is part of the link."""
+    return u.rstrip(".,;:!?")
+
+
 def host_of(url):
     h = url.split("/")[2].lower()
     return h[4:] if h.startswith("www.") else h
@@ -103,7 +110,7 @@ def check_links():
         if md.name == "sources.md":
             continue  # sources.md is the allowlist itself, checked below
         for u in URL_RE.findall(md.read_text()):
-            urls.add((u.rstrip(".,"), md.name))
+            urls.add((trim(u), md.name))
     for slug, deck in decks():
         for row in deck.read_text().splitlines()[1:]:
             cells = row.split("\t")
@@ -116,7 +123,7 @@ def check_links():
             section_ok = "candidate" not in line.lower()
         if section_ok:
             for u in URL_RE.findall(line):
-                urls.add((u.rstrip(".,"), "sources.md"))
+                urls.add((trim(u), "sources.md"))
     for url, origin in sorted(urls):
         if host_of(url) not in hosts:
             err(f"{origin}: host not on allowlist -> {url}")
@@ -128,7 +135,7 @@ def check_links():
     reach_only = set()
     for md in [ROOT / "README.md", *(ROOT / "install").glob("*.md")]:
         for u in URL_RE.findall(md.read_text()):
-            u = u.rstrip(".,")
+            u = trim(u)
             if "github.com/PPDSAgent/handshake" in u:
                 continue
             reach_only.add((u, md.name))
@@ -302,7 +309,79 @@ def check_index():
     for num, row in rows.items():
         if num not in seen:
             err(f"units-index.md lists unit {num:02d} ({row['file']}) but no such file exists")
-    print(f"  checked {len(files)} unit files against {len(rows)} index rows")
+    # A stated total that a machine does not add is a total that goes stale — it did.
+    total = sum(r["est"] for r in rows.values())
+    stated = re.search(r"\*\*Total:\s*(\d+)\s*sessions\*\*", idx.read_text())
+    if not stated:
+        err("units-index.md: no '**Total: N sessions**' line to check the column against")
+    elif int(stated.group(1)) != total:
+        err(f"units-index.md: states {stated.group(1)} total sessions, column sums to {total}")
+    print(f"  checked {len(files)} unit files against {len(rows)} index rows; "
+          f"est_sessions column sums to {total}")
+
+
+def taught_by_unit():
+    """Cumulative ALL-CAPS glosses taught at or before each unit number."""
+    cum, out = set(), {}
+    for n in range(0, 100):
+        for f in (ROOT / "curriculum").glob(f"unit-{n:02d}-*.md"):
+            learn = re.search(r"## Learn\n(.*?)(?=\n## )", f.read_text(), re.S)
+            if learn:
+                for line in learn.group(1).splitlines():
+                    if line.startswith("|") and "http" in line:
+                        gloss = line.split("|")[1].strip()
+                        cum.update(re.findall(r"[A-Z][A-Z\-']{1,}", gloss))
+        out[n] = set(cum)
+    return out
+
+
+def check_missions():
+    """Partner missions must not use a gloss before its unit teaches it, and any
+    count they name must match that unit's Learn table.
+
+    Added after the missions file — written before the curriculum existed — drifted
+    twice: it drilled a sign that had moved to a later unit, and named a count the
+    track tables no longer matched."""
+    print("== missions")
+    f = LEARNERS / "shared" / "missions.md"
+    if not f.exists():
+        err("learners/shared/missions.md: missing")
+        return
+    taught = taught_by_unit()
+    words = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+             "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12}
+    rows = 0
+    for line in f.read_text().splitlines():
+        m = re.match(r"^\|\s*(\d+)\s*\|\s*(.+?)\s*\|", line)
+        if not m:
+            continue
+        unit, text = int(m.group(1)), m.group(2)
+        rows += 1
+        for g in sorted(set(re.findall(r"\b[A-Z][A-Z\-]{2,}\b", text)) - {"ASL"}):
+            if g not in taught.get(unit, set()):
+                warn(f"missions.md unit {unit:02d}: gloss '{g}' is not taught by "
+                     f"unit {unit:02d} or earlier")
+        uf = list((ROOT / "curriculum").glob(f"unit-{unit:02d}-*.md"))
+        if uf:
+            body = uf[0].read_text()
+            learn = re.search(r"## Learn\n(.*?)(?=\n## )", body, re.S)
+            block = learn.group(1) if learn else ""
+            rows_all = [l for l in block.splitlines() if l.startswith("|") and "http" in l]
+            # A track-split unit has several legitimate counts: the whole table, the
+            # shared base, or one track. Accept any of them.
+            valid = {len(rows_all)}
+            segs = re.split(r"\n###\s+Track:", block)
+            if len(segs) > 1:
+                valid.add(len([l for l in segs[0].splitlines()
+                               if l.startswith("|") and "http" in l]))
+                for s in segs[1:]:
+                    valid.add(len([l for l in s.splitlines()
+                                   if l.startswith("|") and "http" in l]))
+            for w, v in words.items():
+                if re.search(rf"\b{w}\b signs?\b", text) and v not in valid:
+                    warn(f"missions.md unit {unit:02d}: says '{w} signs' but the unit's "
+                         f"Learn table offers {sorted(valid)}")
+    print(f"  checked {rows} mission rows")
 
 
 def check_public_hygiene():
@@ -380,6 +459,26 @@ def check_hooks():
             if m:
                 warn(f"{md.name}:{lineno}: prose may describe production "
                      f"('{m.group(0)}'): {s[:70]}")
+    # Multi-gloss phrase cards must cite where the ORDER came from. ASL word order is
+    # not this repo's to invent — a card naming two or more glosses without a URL in
+    # the same bullet is Rule 1 at the phrase level.
+    for md in sorted((ROOT / "curriculum").glob("unit-*.md")):
+        drill = re.search(r"## Drill\n(.*?)(?=\n## )", md.read_text(), re.S)
+        if not drill:
+            continue
+        for bullet in re.split(r"\n(?=\s*-\s)", drill.group(1)):
+            # Two acceptable answers: cite where the order is attested, or say plainly
+            # that it is a drill sequence and not a sentence.
+            disclaimed = re.search(r"(?i)fluency drill|not (an )?attested sentence|"
+                                   r"not attested|drill sequence", bullet)
+            for prompt in re.findall(r'"Sign:\s*([^"]+)"', bullet):
+                glosses = re.findall(r"\b[A-Z][A-Z\-']{1,}\b", prompt)
+                if len(glosses) >= 2 and "http" not in bullet and not disclaimed:
+                    warn(f"{md.name}: phrase card \"{' '.join(prompt.split())}\" names "
+                         f"{len(glosses)} glosses but its bullet neither cites a URL "
+                         f"nor calls itself a fluency drill — ASL word order is not "
+                         f"this repo's to invent")
+
     # Sign count is a guideline (8-15), not law — units 00/01/10/11 are legitimately
     # outside it. Surface, never fail.
     for md in sorted((ROOT / "curriculum").glob("unit-*.md")):
@@ -388,10 +487,15 @@ def check_hooks():
         if learn:
             count = len([l for l in learn.group(1).splitlines()
                          if l.startswith("|") and "http" in l])
-            if count and not 8 <= count <= 15:
+            # Suppress where the unit's own prose already owns the deviation — a
+            # guideline the author consciously departed from and explained is not a
+            # finding, and a noisy gate is one people stop reading.
+            explained = re.search(r"(?i)above the usual 8[–-]15|below the usual 8[–-]15|"
+                                  r"deliberately small|track-split design|"
+                                  r"not an oversight|on purpose", body)
+            if count and not 8 <= count <= 15 and not explained:
                 warn(f"{md.name}: {count} signs in ## Learn (guideline is 8-15) — "
-                     f"intentional for a track-split or deliberately-small unit, "
-                     f"otherwise rebalance")
+                     f"rebalance, or explain the deviation in the unit's own prose")
     print(f"  scanned {n} hooks/hints and {prose} prose lines")
 
 
@@ -404,6 +508,8 @@ if __name__ == "__main__":
         check_index()
     if run_all or "--learners" in args:
         check_learners()
+    if run_all or "--missions" in args:
+        check_missions()
     if run_all or "--deck" in args:
         check_deck()
     if run_all or "--hooks" in args:

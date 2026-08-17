@@ -20,14 +20,23 @@ of it you'll have configured the system *and* produced your first ASL.
   fingerspelling landing page at ASL University (free curriculum by Dr. Bill Vicars,
   a Deaf professor). Skim the intro and find the alphabet chart; ~5 minutes. Unit 01
   goes deep here — today is just reconnaissance.
+- https://www.lifeprint.com/asl101/pages-signs/n/name.htm — the NAME page, and worth
+  two minutes before you introduce yourself to anyone. Dr. Vicars is blunt about the
+  most common beginner habit: signing "MY NAME" before your name. Deaf signers mostly
+  don't. The attested form of the question is `NAME YOU?`, and the answer is usually
+  just your name, fingerspelled. Learning the habit that fluent signers actually use
+  is cheaper now than unlearning the other one later.
 
 ## Learn
+
+Three signs only — deliberately small, on purpose. Today's work is mostly
+configuration and your first fingerspelling; unit 01 is where the volume starts.
 
 | sign | source | hook |
 |---|---|---|
 | HELLO | https://www.lifeprint.com/asl101/pages-signs/h/hello.htm | your opener for every session and every conversation |
 | NAME | https://www.lifeprint.com/asl101/pages-signs/n/name.htm | the first question Deaf people will ask you |
-| ME | https://www.lifeprint.com/asl101/pages-signs/m/me.htm | pairs with NAME: "MY NAME…" — your first sentence |
+| ME | https://www.lifeprint.com/asl101/pages-signs/m/me.htm | the sign for yourself — but read the NAME page before you reach for it in an introduction |
 
 ## Drill
 

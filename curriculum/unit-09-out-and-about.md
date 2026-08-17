@@ -18,11 +18,11 @@ aren't re-taught here; that's unit 06 — drill back to it if it's rusty.
 
 ## Watch
 
-- https://www.lifeprint.com/asl101/lessons/lesson22.htm — Lesson 22: Money. Covers
+- https://www.lifeprint.com/asl101/lessons/lesson22.htm — Lesson 22 — money and price vocabulary. Covers
   MONEY, COST, and BUY in the context of actual transactions; STORE isn't taught on
   this page — its own entry in Learn below has the source for that one (~10 min).
-- https://www.lifeprint.com/asl101/lessons/lesson26.htm — Lesson 26: Nature &
-  Outdoors. This unit's only overlap with that lesson is OUTSIDE; the rest of the
+- https://www.lifeprint.com/asl101/lessons/lesson26.htm — Lesson 26 — nature and
+  outdoor vocabulary. This unit's only overlap with that lesson is OUTSIDE; the rest of the
   page is nature vocabulary and Deaf history, not errands-and-outdoors content.
   STORE, CAR, and WALK are covered by their own pages in Learn below, not this
   lesson (~10 min).
@@ -51,11 +51,14 @@ When this unit opens, `/lesson` appends to the deck:
   MONEY", "Sign: COST", "Sign: CAR", "Sign: DRIVE", "Sign: WALK", "Sign: STOP",
   "Sign: OUTSIDE"). Nine cards, source = each sign's page above.
 - Two `phrase` cards that put this unit's vocab to work alongside unit 06's WHERE
-  (reviewed, not retaught — no new source needed for WHERE itself): "Sign: STORE
-  WHERE?" (translation cue: which store — WH-word last, matching the order shown on
-  this unit's own source pages, not English order) and "Sign: CAR STOP" (translation
-  cue: the car isn't going anywhere — pulled over, or it broke down) (sources = the
-  STORE and CAR/STOP pages above).
+  (reviewed, not retaught). **Both are fluency drills, not attested sentences** — the
+  sign pages below teach each sign and none of them attests these pairings: "Sign:
+  STORE WHERE?" (translation cue: which store) and "Sign: CAR STOP" (translation cue:
+  the car isn't going anywhere — pulled over, or it broke down). Sign sources = the
+  STORE and CAR/STOP pages above. For WH-final order specifically, lesson 2 is the
+  page that actually demonstrates it —
+  https://www.lifeprint.com/asl101/lessons/lesson02.htm, which also cautions that it
+  is a myth WH-signs *must* go last.
 
 ## Family mission
 

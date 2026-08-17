@@ -21,6 +21,14 @@ est_sessions: 4             # 15–20 min sessions to complete
    to have. Write to a smart adult; no filler.
 2. **`## Watch`** — 2–5 links to allowlist lesson pages/videos (`sources.md`), each
    with one line saying what it covers and roughly how long it runs.
+
+   **Describe the page; don't invent a title for it.** Lifeprint numbers its lessons
+   and does not name them, so write `Lesson 40 — tools and hardware vocabulary` (a
+   description you can defend from the page's own contents) and never `Lesson 40:
+   Tools & Hardware` (a title the source doesn't have, formatted to look quoted).
+   The same rule governs the description itself: only claim coverage you have
+   confirmed by reading the page's vocabulary list. Overstating what a Watch link
+   teaches is the most common defect this curriculum has produced.
 3. **`## Learn`** — the vocab table:
 
    | sign | source | hook |

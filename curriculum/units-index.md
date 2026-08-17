@@ -19,8 +19,9 @@ each unit file's frontmatter exactly — `tools/verify.py --index` enforces it.
 | 11 | `unit-11-deaf-culture.md` | Deaf Culture & Community | built | 3 |
 | 12 | `unit-12-conversation-ops.md` | Conversation Ops | built | 6 |
 
-**Total: 52 sessions** of 15–20 minutes — roughly 2.5 months at five a week, four months
-at three. Unit 10 is track-split: its Learn section holds a shared base plus a
+**Total: 56 sessions** of 15–20 minutes — roughly three months at five a week, or a
+little over four at three. (`tools/verify.py --index` adds the column and fails if this
+number disagrees with it.) Unit 10 is track-split: its Learn section holds a shared base plus a
 `workshop` and a `clinical` extension, and a learner is taught the base plus whichever
 track their `profile.md` names.
 

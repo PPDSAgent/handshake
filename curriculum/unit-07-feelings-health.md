@@ -56,9 +56,16 @@ When this unit opens, `/lesson` appends to the deck:
   ANGRY", "Sign: TIRED", "Sign: SICK", "Sign: HURT", "Sign: DOCTOR", "Sign:
   MEDICINE", "Sign: FEEL", "Sign: DEAF", "Sign: HARD-OF-HEARING", "Sign:
   HEARING"). 12 cards.
-- Two `phrase` cards built from the Learn vocabulary: "Sign: HOW YOU FEEL" (the
-  how-are-you opener) and "Sign: ME DEAF" / "ME HEARING" — whichever matches the
-  learner (ask, don't assume; source: the DEAF and HEARING pages above).
+- One `phrase` card with an attested order: "Sign: HOW YOU FEEL?" — glossed verbatim
+  as practice item 11.B/06 at https://www.lifeprint.com/asl101/lessons/lesson11.htm
+  and again as "TELL-me HOW YOU FEEL" at
+  https://www.lifeprint.com/asl101/lessons/lesson10.htm. Note the WH-sign leads here,
+  the way lesson 5 says it does — not the English "how do you feel."
+- One `phrase` card that is a **fluency drill, not an attested sentence**: "Sign: ME
+  DEAF" or "Sign: ME HEARING", whichever matches the learner (ask, don't assume). The
+  DEAF and HEARING pages above teach each sign; neither attests this two-sign pairing,
+  so treat it as a production run and let the lesson videos show you how identity is
+  actually framed in conversation.
 
 ## Family mission
 

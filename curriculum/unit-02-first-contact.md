@@ -57,8 +57,9 @@ When this unit opens, `/lesson` appends to the deck:
 - One `vocab` card per Learn row above (prompts: "Sign: NICE", "Sign: MEET-YOU",
   "Sign: THANK-YOU", "Sign: PLEASE", "Sign: SORRY", "Sign: YES", "Sign: NO",
   "Sign: GOOD", "Sign: BAD", "Sign: GOODBYE", "Sign: AGAIN", "Sign: SLOW"). 12 cards.
-- One `phrase` card: "Sign: NICE MEET-YOU" (source: lesson01.htm above — it appears
-  verbatim in that page's Story 1 and practice-sentence set). AGAIN and SLOW are
+- One `phrase` card with an attested order: "Sign: NICE MEET-YOU" — it appears
+  verbatim in Story 1 and the practice-sentence set at
+  https://www.lifeprint.com/asl101/lessons/lesson01.htm. AGAIN and SLOW are
   drilled as the standalone signs in the vocab cards above, not as a combined
   request phrase — no allowlist source attests a specific "PLEASE AGAIN" or "SLOW
   PLEASE" combination, and guessing at word order here would be exactly the kind of
