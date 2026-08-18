@@ -74,5 +74,6 @@ from their sites.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). The linked lesson content belongs to its creators and
-is not part of this repository.
+MIT — see [LICENSE](LICENSE). The linked lesson content belongs to its creators and is
+not part of this repository; [NOTICE.md](NOTICE.md) explains that boundary and why it's
+a design constraint rather than an oversight.
