@@ -84,7 +84,9 @@ on purpose. Tune it: if reviews feel too easy, raise the starting interval; too
 brutal, lower the ease floor. Note experiments in the journal so the data means
 something. **Handshake Lite implements the identical algorithm** — this file is the
 normative spec for both; if you change one side, change the other or the pair drifts
-apart (`tools/test_srs_parity.py`, once built, is the referee).
+apart. No automated parity check exists yet: `tools/test_srs_parity.py` is planned
+with Lite (Phase 6 of the build plan) and is not built, so for now parity is kept by
+hand.
 
 ## The pairing model
 

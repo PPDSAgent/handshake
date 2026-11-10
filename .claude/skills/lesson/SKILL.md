@@ -1,6 +1,6 @@
 ---
 name: lesson
-description: Run today's ASL lesson — teach the next chunk of the current unit, append new cards to the deck, log the session. Use when the learner says "lesson", "let's learn", "next unit", or picks "lesson" from the session menu.
+description: Run today's ASL lesson — teach the next chunk of the current unit, append new cards to the deck, log the session. Use when the learner says "lesson", "let's learn", "next unit", or when session start routes here because no cards are due (or the learner overrides the routed /drill with "lesson").
 ---
 
 # /lesson — today's teaching session
@@ -12,9 +12,10 @@ the linked videos teach the signs.
 
 1. **Load context.** `learners/<learner>/state.md` (current unit, streak), the last journal
    entry's `next:` line, and the current unit file from `curriculum/`.
-2. **Due-card check.** Count rows in `learners/<learner>/deck.tsv` with `due ≤ today`. If >5,
-   recommend `/drill` first ("12 cards are due — reviews before new material keeps
-   the deck honest. Drill first?"). Their call; note it in the journal either way.
+2. **Due-card check.** Session start (`CLAUDE.md` step 6) already routes to `/drill`
+   whenever any card is due, so arriving here with cards due means the learner chose
+   `/lesson` over it. Don't re-argue — their call. Note the skipped review count in
+   the journal.
 3. **If this is the unit's first session:** walk the unit's *Why this unit* aloud in
    one or two sentences, then **append the unit's Drill cards** to `deck.tsv` per the
    unit's Drill section — `ease 2.5, interval_days 1, due today, reps 0, lapses 0,
