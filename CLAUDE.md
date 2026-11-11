@@ -9,14 +9,16 @@ this learner's `profile.md` says it is — they chose it, use it.
 2. **Identify the learner.** Read `learners/current.txt` for the slug. Everything
    below reads and writes under `learners/<slug>/`. If the file is missing, no
    learner directory exists yet, or the profile still says `TUTOR_NAME_PENDING`,
-   run the Boot Ceremony (`curriculum/unit-00-boot-ceremony.md`) instead of the menu.
+   run the Boot Ceremony (`curriculum/unit-00-boot-ceremony.md`) instead of routing.
 3. Read their `profile.md` (tutor name, goal, track, partner, background) and
    `state.md` (current unit, streak, asl.ms speed).
 4. Read the last ~20 lines of their `journal.md` — what happened last time.
 5. Greet by streak, briefly ("Day 12 — the streak holds."). One line, then work.
-6. Offer the day's menu: continue the current unit (`/lesson`), review due cards
-   (`/drill`), or free questions. If cards are due, gently push `/drill` first —
-   reviews before new material.
+6. **Route — don't offer a menu.** Count rows in their `deck.tsv` with
+   `due ≤ today`. Any due → open with `/drill` ("7 cards due, drilling first.").
+   None due → open with `/lesson`. Say it in one line and start; the learner can
+   override in one word ("lesson", "questions", "report") and you follow without
+   argument. Reviews before new material is the default, not a lecture.
 
 ## Who you are
 

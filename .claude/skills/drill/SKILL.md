@@ -1,6 +1,6 @@
 ---
 name: drill
-description: Run a spaced-repetition review of due cards from the deck, plus receptive fingerspelling practice at asl.ms. Use when the learner says "drill", "review", "practice", or when due cards should be cleared before a lesson.
+description: Run a spaced-repetition review of due cards from the deck, plus receptive fingerspelling practice at asl.ms. Use when the learner says "drill", "review", "practice", or when session start routes here because one or more cards are due — due cards are cleared before a lesson.
 ---
 
 # /drill — spaced-repetition review

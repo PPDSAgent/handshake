@@ -38,7 +38,7 @@ exercise.
 | `rules/` | The tutor's law (Rule 1 is the one above) |
 | `curriculum/` | 12 units, from fingerspelling to real conversation |
 | `learners/` | One folder per person — deck, streak, journal, all plain files. Ships as a template; the Boot Ceremony creates yours |
-| `.claude/skills/` | `/lesson` and `/drill` — the two commands you'll actually use |
+| `.claude/skills/` | Six tutor commands: `/lesson` and `/drill` (the daily loop — the tutor picks which), plus `/quiz`, `/report`, `/coach`, `/checkin` |
 | `tools/` | `verify.py` (link + data + prose checks), `make_tarball.sh` (offline packaging) |
 | `install/` | **Start here** → [install/INSTALL.md](install/INSTALL.md) |
 | `docs/` | Design spec, build plan, maintainer guide |

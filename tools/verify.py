@@ -6,7 +6,7 @@ Usage:
     python3 tools/verify.py --links    # URL allowlist + reachability only
     python3 tools/verify.py --units    # curriculum format lint only
     python3 tools/verify.py --index    # units-index.md vs frontmatter consistency
-    python3 tools/verify.py --deck     # deck.tsv schema lint, all learners
+    python3 tools/verify.py --deck     # deck.tsv schema lint, all learners + tools/fixtures
     python3 tools/verify.py --learners # template + learner profile/state lint
     python3 tools/verify.py --missions # partner missions vs what each unit teaches
     python3 tools/verify.py --hooks    # Rule-1 heuristic on hook/hint prose
@@ -24,6 +24,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCES = ROOT / "curriculum" / "sources.md"
 LEARNERS = ROOT / "learners"
+# Test-only deck for check_deck. Lives outside learners/ so it is never a learner
+# and never trips the Boot Ceremony; not linted by --links or --hooks.
+FIXTURE_DECK = ROOT / "tools" / "fixtures" / "deck.tsv"
 PROFILE_KEYS = ["learner", "display_name", "tutor_name", "goal", "surface", "track",
                 "partner", "background"]
 STATE_KEYS = ["current_unit", "streak", "last_session", "asl_ms_speed"]
@@ -175,8 +178,11 @@ def check_units():
 def check_deck():
     print("== decks")
     total = 0
-    for slug, deck in decks():
-        where = f"{slug}/deck.tsv"
+    # The fixture runs first so the schema check always sees cards — a fresh clone
+    # has no learners, and a check that never sees input proves nothing.
+    targets = [("fixture", FIXTURE_DECK, "tools/fixtures/deck.tsv")] + \
+        [(slug, deck, f"{slug}/deck.tsv") for slug, deck in decks()]
+    for slug, deck, where in targets:
         lines = deck.read_text().splitlines()
         if not lines or lines[0].split("\t") != DECK_COLS:
             err(f"{where}: header row does not match spec (see learners/README.md)")
@@ -205,7 +211,7 @@ def check_deck():
                 except ValueError:
                     err(f"{where} line {n}: {label} not ISO date: '{val}'")
         total += len(lines) - 1
-    print(f"  checked {total} cards across {len(decks())} learners")
+    print(f"  checked {total} cards across {len(decks())} learners + fixture")
 
 
 def check_learners():
